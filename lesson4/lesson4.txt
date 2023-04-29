@@ -1,0 +1,53 @@
+1) Преобразовать дату начала потока в таблице потоков к виду год-месяц-день. Используйте команду UPDATE.
+
+sqlite> UPDATE streams SET started_at = SUBSTR(started_at, 7, 4) || '-' || SUBSTR(started_at, 4, 2) || '-' || SUBSTR(started_at, 1, 2);
+sqlite> SELECT * FROM streams
+   ...> ;
+id  course_id  number  started_at  students_amount  finished_at
+--  ---------  ------  ----------  ---------------  -----------
+1   3          165     2020-08-18  34                          
+2   2          178     2020-10-02  37                          
+3   1          203     2020-11-12  35                          
+4   1          210     2020-12-03  41
+
+
+2) Получите идентификатор и номер потока, запланированного на самую позднюю дату.
+
+sqlite> SELECT id, number FROM streams ORDER BY started_at DESC LIMIT 1;
+id  number
+--  ------
+4   210   
+
+
+3) Покажите уникальные значения года по датам начала потоков обучения.
+
+sqlite> SELECT DISTINCT(SUBSTR(started_at, 1, 4)) FROM streams;
+(SUBSTR(started_at, 1, 4))
+--------------------------
+2020 
+
+
+4) Найдите количество преподавателей в базе данных. Выведите искомое значение в столбец с именем total_teachers.
+
+sqlite> SELECT COUNT(*) AS 'total_teachers' FROM teachers;
+total_teachers
+--------------
+3  
+
+
+5) Покажите даты начала двух последних по времени потоков.
+
+sqlite> SELECT started_at FROM streams ORDER BY started_at DESC LIMIT 2;
+started_at
+----------
+2020-12-03
+2020-11-12
+
+
+6) Найдите среднюю успеваемости учеников по всем потокам преподавателя с идентификатором равным 1.
+
+sqlite> SELECT AVG(performance) FROM grades WHERE teacher_id = 1;
+AVG(performance)
+----------------
+4.85            
+
