@@ -1,0 +1,78 @@
+
+1) Найдите потоки, количество учеников в которых больше или равно 40. В отчет выведите номер потока, название курса и количество учеников.
+
+sqlite> SELECT
+   ...> number,
+   ...> (SELECT name FROM courses WHERE id = course_id) AS name_course,
+   ...> students_amount
+   ...> FROM streams
+   ...> WHERE students_amount > 40;
+number  name_course  students_amount
+------  -----------  ---------------
+210     Базы данных  41
+
+
+2) Найдите два потока с самыми низкими значениями успеваемости. В отчет выведите номер потока, название курса, фамилию и имя преподавателя (одним столбцом), оценку успеваемости.
+
+sqlite> SELECT 
+   ...> (SELECT number FROM streams WHERE id = stream_id) AS number_stream,
+   ...> (SELECT name FROM courses WHERE id = (SELECT course_id FROM streams WHERE id = stream_id)) AS name_course,
+   ...> (SELECT name || ' ' || surname FROM teachers WHERE id = teacher_id) AS name_taecher,
+   ...> performance
+   ...> FROM grades
+   ...> ORDER BY performance LIMIT 2;
+number_stream  name_course             name_taecher      performance
+-------------  ----------------------  ----------------  -----------
+165            Linux. Рабочая станция  Елена Малышева    4.7        
+203            Базы данных             Николай Савельев  4.8
+
+
+3) Найдите среднюю успеваемость всех потоков преподавателя Николая Савельева. В отчёт выведите идентификатор преподавателя и среднюю оценку по потокам.
+
+sqlite> SELECT
+   ...> teacher_id,
+   ...> AVG(performance)
+   ...> FROM grades
+   ...> WHERE teacher_id = (SELECT id FROM teachers WHERE name = 'Николай' AND surname = 'Савельев');
+teacher_id  AVG(performance)
+----------  ----------------
+1           4.85 
+
+
+4) Найдите потоки преподавателя Натальи Петровой, а также потоки, по которым успеваемость ниже 4.8. В отчёт выведите идентификатор потока, фамилию и имя преподавателя. В отчёте должно быть 3 столбца - номер потока, фамилия преподавателя, имя преподавателя.
+
+
+ВАРИАНТ 1
+
+SELECT
+   ...> (SELECT number FROM streams WHERE id = stream_id) AS number_stream,
+   ...> (SELECT surname FROM teachers WHERE id = teacher_id) AS surname,
+   ...> (SELECT name FROM teachers WHERE id = teacher_id) AS name
+   ...> FROM grades
+   ...> WHERE teacher_id = (SELECT id FROM teachers WHERE name = 'Наталья' AND surname = 'Петрова')
+   ...> UNION ALL
+   ...> SELECT
+   ...> (SELECT number FROM streams WHERE id = stream_id) AS number_stream,
+   ...> (SELECT surname FROM teachers WHERE id = teacher_id) AS surname,
+   ...> (SELECT name FROM teachers WHERE id = teacher_id) AS name
+   ...> FROM grades
+   ...> WHERE performance < 4.8;
+number_stream  surname   name   
+-------------  --------  -------
+178            Петрова   Наталья
+165            Малышева  Елена
+
+
+ВАРИАНТ 2
+
+SELECT
+   ...> (SELECT number FROM streams WHERE id = stream_id) AS number_stream,
+   ...> (SELECT surname FROM teachers WHERE id = teacher_id) AS surname,
+   ...> (SELECT name FROM teachers WHERE id = teacher_id) AS name
+   ...> FROM grades
+   ...> WHERE teacher_id = (SELECT id FROM teachers WHERE name = 'Наталья' AND surname = 'Петрова') OR performance < 4.8;
+number_stream  surname   name   
+-------------  --------  -------
+165            Малышева  Елена  
+178            Петрова   Наталья
+
