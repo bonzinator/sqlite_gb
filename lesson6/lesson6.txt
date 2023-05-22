@@ -1,0 +1,49 @@
+1) Покажите информацию по потокам. В отчет выведите номер потока, название курса и дату начала занятий
+
+sqlite> SELECT 
+   ...> number,
+   ...> name AS course_name,
+   ...> started_at
+   ...> FROM streams JOIN courses
+   ...> ON streams.course_id = courses.id;
+number  course_name             started_at
+------  ----------------------  ----------
+165     Linux. Рабочая станция  2020-08-18
+178     Основы Python           2020-10-02
+203     Базы данных             2020-11-12
+210     Базы данных             2020-12-03
+
+
+2) Найдите общее количество учеников для каждого курса. В отчёт выведите название курса и количество учеников по всем потокам курса.
+
+sqlite> SELECT 
+   ...> name AS course_name,
+   ...> SUM(students_amount)
+   ...> FROM streams JOIN courses ON streams.course_id = courses.id
+   ...> GROUP BY name;
+course_name             SUM(students_amount)
+----------------------  --------------------
+Linux. Рабочая станция  34                  
+Базы данных             76                  
+Основы Python           37  
+
+
+3) Для всех учителей найдите среднюю оценку по всем проведённым потокам. В отчёт выведите идентификатор, фамилию и имя учителя, среднюю оценку по всем проведенным потокам. Важно чтобы учителя, у которых не было потоков, также попали в выборку.
+
+SELECT
+   ...> id,
+   ...> name,
+   ...> surname,
+   ...> AVG(performance) AS avg_perf
+   ...> FROM teachers LEFT JOIN grades
+   ...> ON teachers.id = grades.teacher_id
+   ...> GROUP BY teacher_id;
+id  name     surname   avg_perf
+--  -------  --------  --------
+1   Николай  Савельев  4.85    
+2   Наталья  Петрова   4.9     
+3   Елена    Малышева  4.7
+
+
+
+
