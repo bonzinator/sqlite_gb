@@ -1,0 +1,50 @@
+1) Создайте представление, которое для каждого курса выводит название, номер последнего потока, дату начала обучения последнего потока и среднюю успеваемость курса по всем потокам.
+
+sqlite> CREATE VIEW info_course AS
+   ...> SELECT
+   ...> courses.name,
+   ...> MAX(number),
+   ...> AVG(grades.performance)
+   ...> FROM courses LEFT JOIN streams
+   ...> ON courses.id = streams.course_id
+   ...> LEFT JOIN grades
+   ...> ON streams.id = grades.stream_id
+   ...> GROUP BY courses.name;
+sqlite> SELECT * FROM info_course;
+name                    MAX(number)  AVG(grades.performance)
+----------------------  -----------  -----------------------
+Linux. Рабочая станция  165          4.7                    
+Базы данных             210          4.85                   
+Основы Python           178          4.9  
+
+
+2) Удалите из базы данных всю информацию, которая относится к преподавателю с
+идентификатором, равным 3. Используйте транзакцию.
+
+sqlite> BEGIN TRANSACTION;
+sqlite>   DELETE FROM grades WHERE teacher_id = 3;
+sqlite>   DELETE FROM teachers WHERE id = 3;
+sqlite> COMMIT;
+sqlite> SELECT * FROM teachers;
+id  name     surname   email              
+--  -------  --------  -------------------
+1   Николай  Савельев  saveliev.n@mai.ru  
+2   Наталья  Петрова   petrova.n@yandex.ru
+
+
+3) Создайте триггер для таблицы успеваемости, который проверяет значение успеваемости на соответствие диапазону чисел от 0 до 5 включительно.
+
+sqlite> CREATE TRIGGER chek_perfomance BEFORE INSERT
+   ...> ON grades
+   ...> BEGIN
+   ...>   SELECT CASE
+   ...>   WHEN
+   ...>     (NEW.performance NOT BETWEEN 0 AND 5)
+   ...> THEN 
+   ...> RAISE(ABORT, 'Estimation value error')
+   ...>   END;
+   ...> END;
+sqlite> INSERT INTO grades (teacher_id, stream_id, performance) VALUES (4, 5, 6);
+Error: stepping, Estimation value error (19)
+
+
