@@ -1,21 +1,22 @@
 1) Создайте представление, которое для каждого курса выводит название, номер последнего потока, дату начала обучения последнего потока и среднюю успеваемость курса по всем потокам.
 
-sqlite> CREATE VIEW info_course AS
+sqlite> CREATE VIEW info_course_2 AS
    ...> SELECT
    ...> courses.name,
    ...> MAX(number),
+   ...> MAX(started_at),
    ...> AVG(grades.performance)
    ...> FROM courses LEFT JOIN streams
    ...> ON courses.id = streams.course_id
    ...> LEFT JOIN grades
    ...> ON streams.id = grades.stream_id
    ...> GROUP BY courses.name;
-sqlite> SELECT * FROM info_course;
-name                    MAX(number)  AVG(grades.performance)
-----------------------  -----------  -----------------------
-Linux. Рабочая станция  165          4.7                    
-Базы данных             210          4.85                   
-Основы Python           178          4.9  
+sqlite> SELECT * FROM info_course_2;
+name                    MAX(number)  MAX(started_at)  AVG(grades.performance)
+----------------------  -----------  ---------------  -----------------------
+Linux. Рабочая станция  165          2020-08-18       4.7                       
+Базы данных             210          2020-12-03       4.85                   
+Основы Python           178          2020-10-02       4.9  
 
 
 2) Удалите из базы данных всю информацию, которая относится к преподавателю с

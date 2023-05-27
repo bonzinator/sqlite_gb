@@ -1,0 +1,56 @@
+1) Найдите общее количество учеников для каждого курса. В отчёт выведите название курса и количество учеников по всем потокам курса. Решите задание с применением оконных функций.
+
+sqlite> SELECT DISTINCT
+   ...> courses.name AS course_name,
+   ...> SUM(students_amount) OVER(PARTITION BY courses.id) AS all_students
+   ...> FROM courses LEFT JOIN streams
+   ...> ON streams.course_id = courses.id;
+course_name             all_students
+----------------------  ------------
+Базы данных             76          
+Основы Python           37          
+Linux. Рабочая станция  34 
+
+
+
+2) Найдите среднюю оценку по всем потокам для всех учителей. В отчёт выведите
+идентификатор, фамилию и имя учителя, среднюю оценку по всем проведённым потокам.
+Учителя, у которых не было потоков, также должны попасть в выборку. Решите задание с применением оконных функций.
+
+sqlite> SELECT DISTINCT
+   ...> teachers.id,
+   ...> teachers.name,
+   ...> teachers.surname,
+   ...> AVG(grades.performance) OVER(PARTITION BY teachers.id) AS cp_per
+   ...> FROM teachers LEFT JOIN grades ON grades.teacher_id = teachers.id;
+id  name     surname   cp_per
+--  -------  --------  ------
+1   Николай  Савельев  4.85  
+2   Наталья  Петрова   4.9 
+
+
+
+3) Какие индексы надо создать для максимально быстрого выполнения представленного
+запроса?
+SELECT
+  surname,
+  name,
+  number,
+  performance
+FROM academic_performance
+  JOIN teachers
+    ON academic_performance.teacher_id = teachers.id
+  JOIN streams
+    ON academic_performance.stream_id = streams.id
+WHERE number >= 200;
+
+CREATE INDEX academic_performance_number_idx ON academic_performance(number)
+CREATE INDEX academic_performance_teacher_id_idx ON academic_performance(teacher_id)
+CREATE INDEX academic_performance_stream_id_idx ON academic_performance(stream_id)
+
+
+
+4) Установите SQLiteStudio, подключите базу данных учителей, выполните в графическом клиенте любой запрос.
+
+Скриншот приложен к ДЗ. 
+sqlitestudio установить не получилось, вместо этого был установлен DB Broser for sqlite.
